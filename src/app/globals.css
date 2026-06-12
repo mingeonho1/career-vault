@@ -1,0 +1,28 @@
+/* Pretendard Variable — 토스가 만든 한글 가변 폰트 */
+@import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css");
+
+@import "tailwindcss";
+
+@theme {
+  --font-sans:
+    "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont,
+    system-ui, "Apple SD Gothic Neo", sans-serif;
+
+  /* 디자인 토큰 — 상세 규칙은 .claude/skills/design 참조 */
+  --color-bg: #ffffff;
+  --color-surface: #f9fafb;
+  --color-border: #e5e8eb;
+  --color-ink: #191f28;
+  --color-ink-sub: #4e5968;
+  --color-ink-weak: #8b95a1;
+  --color-primary: #3182f6;
+  --color-primary-strong: #1b64da;
+  --color-danger: #f04452;
+}
+
+body {
+  background-color: var(--color-bg);
+  color: var(--color-ink);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
