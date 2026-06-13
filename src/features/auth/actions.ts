@@ -1,5 +1,7 @@
 "use server";
 
+import { headers } from "next/headers";
+
 import { loginSchema } from "@/features/auth/schema";
 import { createSupabaseServerClient } from "@/lib/db-server";
 import { env } from "@/lib/env";
@@ -19,11 +21,17 @@ export async function sendMagicLink(
     };
   }
 
+  // 요청 Origin 헤더에서 베이스 URL을 도출한다.
+  // server action은 브라우저 POST이므로 Origin 헤더가 항상 오지만,
+  // 없는 경우(직접 API 호출 등)에는 env.SITE_URL로 폴백한다.
+  const requestHeaders = await headers();
+  const base = requestHeaders.get("origin") ?? env.SITE_URL;
+
   const supabase = await createSupabaseServerClient();
   const { error } = await supabase.auth.signInWithOtp({
     email: parsed.data.email,
     options: {
-      emailRedirectTo: `${env.SITE_URL}/auth/callback`,
+      emailRedirectTo: `${base}/auth/callback`,
     },
   });
 
