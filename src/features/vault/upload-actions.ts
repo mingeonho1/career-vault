@@ -36,10 +36,23 @@ async function storeFile(sb: SupabaseClient, file: File, path: string) {
   const { error } = await sb.storage
     .from("certificates")
     .upload(path, buf, { contentType: file.type });
-  if (error) return null;
-  const { data } = await sb.storage
+  if (error) {
+    console.error("[uploadFile] storage upload error", {
+      message: error.message,
+      name: error.name,
+    });
+    return null;
+  }
+  const { data, error: urlError } = await sb.storage
     .from("certificates")
     .createSignedUrl(path, 3600);
+  if (urlError) {
+    console.error("[uploadFile] createSignedUrl error", {
+      message: urlError.message,
+      name: urlError.name,
+    });
+    return null;
+  }
   return data?.signedUrl ?? "";
 }
 
@@ -101,7 +114,14 @@ export async function uploadFile(formData: FormData): Promise<UploadResult> {
   const policyErr = await checkFileAndPolicy(sb, user.id, file);
   if (policyErr) return policyErr;
 
-  const storagePath = `${user.id}/${Date.now()}-${file.name}`;
+  const MIME_TO_EXT: Record<string, string> = {
+    "application/pdf": "pdf",
+    "image/png": "png",
+    "image/jpeg": "jpg",
+  };
+  const ext = MIME_TO_EXT[file.type];
+  if (!ext) return err("지원하지 않는 파일 형식이에요.");
+  const storagePath = `${user.id}/${Date.now()}-${globalThis.crypto.randomUUID()}.${ext}`;
   const signedUrl = await storeFile(sb, file, storagePath);
   if (signedUrl === null)
     return err("파일 업로드에 실패했어요. 잠시 후 다시 시도해 주세요.");
