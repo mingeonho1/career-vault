@@ -1,10 +1,21 @@
+import { redirect } from "next/navigation";
 import { LoginForm } from "@/features/auth/ui/login-form";
+import { createSupabaseServerClient } from "@/lib/db-server";
 
 export default async function LoginPage({
   searchParams,
 }: {
   searchParams: Promise<{ error?: string }>;
 }) {
+  const supabase = await createSupabaseServerClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (user) {
+    redirect("/vault");
+  }
+
   const params = await searchParams;
   const hasError = Boolean(params.error);
 
