@@ -9,6 +9,7 @@
 3. 추상화는 같은 패턴이 3번 등장한 뒤에만 한다 (Rule of Three).
 4. 모든 외부 입력(폼, API 응답, env)은 경계에서 zod로 검증한다.
 5. 의사결정(기술 선택, 트레이드오프)은 즉시 BUILD_LOG.md에 기록한다 (log-decision 스킬 형식).
+6. env는 모듈 최상위에서 zod 검증한다(철칙 4). `next build`가 import 시 이를 평가하므로 **CI의 `pnpm build` 스텝에는 더미 env를 넣는다** — 키 이름은 env 스키마와 1:1, URL 필드는 URL 형태. 진짜 시크릿은 배포 플랫폼에서 주입(누락 시 그쪽 빌드가 fail-fast). 빠뜨리면 매 push마다 CI가 ZodError로 깨진다 (상세: `shipping` 스킬 §0).
 
 ## 작업 흐름
 
