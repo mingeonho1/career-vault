@@ -184,7 +184,9 @@ async function downloadAndExtract(
       mimeType: doc.mime_type,
     });
     return { ok: true, cards };
-  } catch {
+  } catch (err) {
+    const e = err instanceof Error ? err : new Error(String(err));
+    console.error("[extract] failed", { name: e.name, message: e.message });
     await markFailed(sb, documentId);
     return {
       ok: false,
