@@ -31,6 +31,15 @@ description: 배포 절차와 출시 체크리스트. 일요일 배포 작업, V
 - [ ] env 점검: `.env.local`의 모든 키가 Vercel 프로젝트 env에 등록됐는가. `NEXT_PUBLIC_` 접두사가 붙은 값 중 비밀이어야 하는 게 없는가
 - [ ] Supabase: RLS가 모든 테이블에 켜져 있는가 (꺼진 테이블 = 공개 테이블)
 
+## 1-1. Supabase Auth (매직링크·OAuth 쓰는 빌드의 필수 대시보드 설정)
+
+코드만 맞아도 대시보드 설정이 빠지면 로그인이 통째로 깨진다. 대시보드는 코드로 못 고치니 배포 전 직접 한다.
+
+- [ ] **URL Configuration → Site URL** = 프로덕션 도메인 (`https://...`). 기본값이 `http://localhost:3000`이라, 안 바꾸면 매직링크가 localhost로 폴백한다.
+- [ ] **URL Configuration → Redirect URLs** 허용목록에 프로덕션·로컬 콜백 둘 다 추가: `https://<도메인>/**`, `http://localhost:3000/**`. 허용목록에 없으면 우리가 보낸 `emailRedirectTo`가 무시되고 Site URL로 폴백된다(증상: 링크가 `/auth/callback`이 아닌 루트 `/?code=`로 떨어짐).
+- [ ] **커스텀 SMTP** (Resend·SendGrid 등): 기본 메일은 시간당 2~3통 rate limit + "프로덕션용 아님"이고 발신 주소가 `noreply@mail.app.supabase.io`다. 가입 수를 지표로 삼는 빌드는 출시 트래픽에서 막히므로 사실상 필수.
+- [ ] **Auth 메일 템플릿 브랜딩**: 기본 영문 템플릿은 어느 서비스인지 식별이 안 된다. 제품명 + 해요체 + design 스킬 색 토큰으로 교체한다 (템플릿 파일은 `supabase/email-templates/`에 두고 대시보드에 수동 적용).
+
 ## 2. 배포
 
 1. `git push origin main` → Vercel 자동 배포 (또는 `vercel --prod`)

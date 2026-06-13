@@ -10,6 +10,7 @@ description: TypeScript/React 코드 작성 컨벤션. 코드를 작성하거나
 - tsconfig `strict: true` 고정. `any` 금지 — `unknown`을 받아 좁혀서 쓴다.
 - 외부 경계(API 응답, 폼 입력, env, URL 파라미터)는 zod 스키마가 진실의 원천이다. 타입은 `z.infer`로 파생하고, 같은 모양의 타입을 손으로 다시 정의하지 않는다.
 - env는 시작 시점에 한 번 검증한다: `src/lib/env.ts`에서 `z.object({...}).parse(process.env)` 후 이 모듈만 import.
+- 환경(로컬/프로덕션)마다 달라지는 베이스 URL — 매직링크·OAuth의 콜백/리다이렉트 등 — 은 정적 env에 하드코딩하지 않는다. server action·route handler에서 요청 origin(`headers().get("origin")`)을 우선 쓰고 env는 폴백으로만 둔다. 정적 env에 박으면 환경별로 값이 어긋난다(실제로 프로덕션 매직링크가 localhost로 향하는 사고가 났다).
 - 타입 단언(`as`)은 테스트 코드와 라이브러리 타입 결함 보정에만. 프로덕션 로직에서 `as`가 필요하면 설계가 잘못된 신호.
 
 ## 함수와 구조
