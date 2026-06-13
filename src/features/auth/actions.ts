@@ -36,9 +36,17 @@ export async function sendMagicLink(
   });
 
   if (error) {
+    console.error("[sendMagicLink] Supabase auth error", {
+      status: error.status,
+      code: error.code,
+      message: error.message,
+    });
     return {
       ok: false,
-      error: "링크 발송에 실패했어요. 잠시 후 다시 시도해주세요.",
+      error:
+        error.status === 429
+          ? "인증 메일 발송 한도를 초과했어요. 잠시 후 다시 시도해주세요."
+          : "링크 발송에 실패했어요. 잠시 후 다시 시도해주세요.",
     };
   }
 
