@@ -4,6 +4,7 @@ import type { ExtractedCard } from "@/features/vault/schema";
 import { saveCard } from "@/features/vault/card-actions";
 import { ManualCardForm } from "@/features/vault/ui/manual-card-form";
 import { DetailEditor } from "@/features/vault/ui/detail-editor";
+import { PrecisionAnalysisButton } from "@/features/vault/ui/precision-analysis-button";
 
 const CATEGORY_LABELS = {
   education: "학력",
@@ -183,6 +184,7 @@ export function ExtractReviewForm({ cards, documentId }: Props) {
       >
         {loading ? "저장 중..." : "저장"}
       </button>
+      <PrecisionAnalysisButton />
     </form>
   );
 }

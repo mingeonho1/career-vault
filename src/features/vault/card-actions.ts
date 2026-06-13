@@ -1,7 +1,11 @@
 "use server";
+import { z } from "zod";
 import { createSupabaseServerClient } from "@/lib/db-server";
 import { saveCardSchema } from "@/features/vault/schema";
 import { hasRrnInCardFields } from "@/features/vault/rrn-check";
+
+const ALLOWED_FEATURE_KEYS = ["precision_extract"] as const;
+const featureKeySchema = z.enum(ALLOWED_FEATURE_KEYS);
 
 type SupabaseClient = Awaited<ReturnType<typeof createSupabaseServerClient>>;
 
@@ -60,4 +64,34 @@ export async function saveCard(
       .eq("id", parsed.data.source_document_id);
   }
   return { ok: true, cardId };
+}
+
+export async function recordFeatureInterest(
+  featureKey: string,
+): Promise<{ ok: true } | { ok: false; error: string }> {
+  const parsed = featureKeySchema.safeParse(featureKey);
+  if (!parsed.success) return { ok: false, error: "알 수 없는 기능이에요." };
+
+  const sb = await createSupabaseServerClient();
+  const {
+    data: { user },
+  } = await sb.auth.getUser();
+  if (!user) return { ok: false, error: "로그인이 필요해요." };
+
+  const { error } = await sb
+    .from("feature_interest")
+    .insert({ feature_key: parsed.data, user_id: user.id });
+
+  // 23505 = unique_violation: 이미 관심 등록한 경우 — 성공으로 처리
+  if (error && error.code !== "23505") {
+    console.error("[recordFeatureInterest] insert error", {
+      message: error.message,
+      code: error.code,
+    });
+    return {
+      ok: false,
+      error: "기록에 실패했어요. 잠시 후 다시 시도해 주세요.",
+    };
+  }
+  return { ok: true };
 }
