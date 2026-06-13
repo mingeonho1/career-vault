@@ -2,6 +2,13 @@
 
 ## Decisions
 
+### [2026-06-13] 기본 추출 모델을 gemini-3.1-flash-lite로 변경
+
+- 선택: `extractCardsFromDocument` 기본 model 인자를 `"gemini-3.1-flash-lite"`로 설정
+- 대안: 기존 `gemini-3.5-flash` 유지
+- 이유: 타겟 사용자("대부분 정확하게 기재된 깨끗한 문서")에게 lite 모델이 비용·속도 면에서 충분. 정밀도가 필요한 케이스는 fake-door 수요 확인 후 다음 빌드에서 연결
+- 트레이드오프: 흐릿하거나 오래된 문서에서 추출 정확도가 낮을 수 있음 — fake-door 버튼으로 수요 측정 후 3.5 경로 연결 결정
+
 ### [목 00:00] server-only 패키지로 서버 전용 모듈 클라이언트 번들 유입 차단
 
 - 선택: `server-only` npm 패키지 import를 db.ts 최상단에 추가
@@ -50,6 +57,13 @@
 - 대안: default 유지 (기존 방식)
 - 이유: default가 있으면 프로덕션에서 SITE_URL 미설정 시 매직링크가 localhost로 발송되는 조용한 장애 발생. 기동 시 ZodError로 즉시 실패시켜 배포 전에 포착
 - 트레이드오프: 로컬 dev에서도 .env에 SITE_URL 필수. .env.example에 이미 포함돼 있어 신규 개발자 영향 최소
+
+### [2026-06-13] 기본 추출 모델을 gemini-3.1-flash-lite로 변경
+
+- 선택: `extractCardsFromDocument` 기본 model 인자를 `"gemini-3.1-flash-lite"`로 설정
+- 대안: 기존 `gemini-3.5-flash` 유지
+- 이유: 타겟 사용자("대부분 정확하게 기재된 깨끗한 문서")에게 lite 모델이 비용·속도 면에서 충분. 정밀도가 필요한 케이스는 fake-door 수요 확인 후 다음 빌드에서 연결
+- 트레이드오프: 흐릿하거나 오래된 문서에서 추출 정확도가 낮을 수 있음 — fake-door 버튼으로 수요 측정 후 3.5 경로 연결 결정
 
 ### [2026-06-12] 클라이언트 번들 시크릿 키 노출 없음 확인
 
