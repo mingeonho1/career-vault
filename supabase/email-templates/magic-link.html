@@ -1,0 +1,56 @@
+<!--
+  이력 금고 — 매직링크 로그인 메일 템플릿
+  적용 위치: Supabase 대시보드 → Authentication → Emails → "Magic Link" 템플릿에 붙여넣기.
+  제목(Subject): 이력 금고 로그인 링크예요
+  변수: {{ .ConfirmationURL }} (Supabase가 실제 로그인 링크로 치환)
+  주의: 이 파일은 대시보드에 수동 적용해야 반영된다 (코드가 자동 주입하지 않음).
+        색상은 design 스킬의 컬러 토큰을 그대로 인라인 스타일로 옮긴 값.
+-->
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#F9FAFB;margin:0;padding:32px 0;font-family:-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo','Malgun Gothic',sans-serif;">
+  <tr>
+    <td align="center">
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:440px;background-color:#FFFFFF;border-radius:16px;padding:40px 32px;">
+        <tr>
+          <td style="font-size:15px;font-weight:700;color:#3182F6;padding-bottom:28px;">
+            이력 금고
+          </td>
+        </tr>
+        <tr>
+          <td style="font-size:22px;font-weight:700;color:#191F28;line-height:1.4;padding-bottom:12px;">
+            로그인 링크가 도착했어요
+          </td>
+        </tr>
+        <tr>
+          <td style="font-size:15px;color:#4E5968;line-height:1.6;padding-bottom:28px;">
+            아래 버튼을 누르면 이력 금고에 바로 로그인돼요.<br />
+            이 링크는 잠시 후 만료되고, 한 번만 쓸 수 있어요.
+          </td>
+        </tr>
+        <tr>
+          <td style="padding-bottom:28px;">
+            <a href="{{ .ConfirmationURL }}"
+               style="display:inline-block;background-color:#3182F6;color:#FFFFFF;font-size:16px;font-weight:600;text-decoration:none;padding:14px 24px;border-radius:12px;">
+              이력 금고 로그인하기
+            </a>
+          </td>
+        </tr>
+        <tr>
+          <td style="font-size:13px;color:#8B95A1;line-height:1.6;padding-bottom:8px;">
+            버튼이 눌리지 않으면 아래 주소를 복사해 브라우저에 붙여넣어 주세요.
+          </td>
+        </tr>
+        <tr>
+          <td style="font-size:13px;color:#3182F6;line-height:1.6;word-break:break-all;padding-bottom:28px;">
+            {{ .ConfirmationURL }}
+          </td>
+        </tr>
+        <tr>
+          <td style="border-top:1px solid #E5E8EB;padding-top:20px;font-size:12px;color:#8B95A1;line-height:1.6;">
+            이 메일을 요청한 적이 없다면 무시하셔도 돼요. 누군가 실수로 이메일을 잘못 입력했을 수 있어요.<br />
+            — 이력 금고
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
