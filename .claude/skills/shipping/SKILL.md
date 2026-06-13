@@ -7,6 +7,23 @@ description: 배포 절차와 출시 체크리스트. 일요일 배포 작업, V
 
 전제: reviewer가 `SHIP IT`을 반환한 상태. FAIL이 남아 있으면 이 스킬을 진행하지 않는다.
 
+## 0. CI에서 `pnpm build`는 더미 env가 필요하다 (반복 함정)
+
+`next build`는 "collecting page data" 단계에서 **서버 모듈을 import-time에 평가**한다. 우리는 env를 모듈 최상위에서 검증하고(`src/lib/env.ts`의 `envSchema.parse(process.env)`), SDK 클라이언트도 모듈 최상위에서 인스턴스화한다(`new GoogleGenAI({ apiKey: env.GEMINI_API_KEY })` 등). 그래서 **env가 없는 CI 환경에서 `pnpm build`는 ZodError로 실패한다.** lint/typecheck/test는 env가 필요 없어 통과하므로 build 스텝에서만 터진다.
+
+규칙: CI 워크플로의 **build 스텝에만** 형태만 맞는 더미 env를 준다 (URL 필드는 URL 형태로). 진짜 시크릿은 배포 플랫폼(Vercel)에서 주입하고, 그쪽 빌드는 실제 env로 검증되므로 prod env 누락 시 배포 빌드가 실패한다(fail-fast 유지). `.github/workflows/ci.yml`:
+
+```yaml
+- name: Build
+  run: pnpm build
+  env:
+    SUPABASE_URL: https://placeholder.supabase.co
+    SUPABASE_PUBLISHABLE_KEY: ci-placeholder
+    # ...나머지 키도 더미 값. 키 이름은 src/lib/env.ts 스키마와 1:1로 맞춘다
+```
+
+대안(택1): env를 lazy 검증으로 바꾸고 SDK 클라이언트를 함수 안에서 생성하면 CI/로컬 빌드가 env를 아예 안 본다 — 단 Vercel 빌드도 env 검증을 건너뛰어 누락이 첫 요청 때 터지므로 fail-fast가 약해진다. 배포 시점 차단을 원하면 더미 env 방식을 쓴다.
+
 ## 1. 배포 전 점검
 
 - [ ] `pnpm check` 통과 (로컬 최종 확인)

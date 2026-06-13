@@ -26,8 +26,17 @@ jobs:
       - name: Quality gate (lint + typecheck + test)
         run: pnpm check
 
+      # next build는 서버 모듈을 평가하며 env를 읽는다. CI는 "빌드가 되는가"만
+      # 검증하므로 형태만 맞는 더미 값을 준다. 진짜 시크릿은 배포 플랫폼에서 주입하고,
+      # 그쪽 빌드는 실제 env로 검증되어 누락 시 배포가 실패한다(fail-fast 유지).
       - name: Build
         run: pnpm build
+        env:
+          SUPABASE_URL: https://placeholder.supabase.co
+          SUPABASE_PUBLISHABLE_KEY: ci-placeholder
+          SUPABASE_SECRET_KEY: ci-placeholder
+          GEMINI_API_KEY: ci-placeholder
+          SITE_URL: https://placeholder.example.com
 
       - name: Dead code check (warning only)
         run: pnpm knip || echo "::warning::knip이 죽은 코드를 발견했습니다. reviewer 검수 시 확인하세요."
