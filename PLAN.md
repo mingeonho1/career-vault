@@ -123,13 +123,13 @@ env 키 이름 고정: `SUPABASE_URL` / `SUPABASE_PUBLISHABLE_KEY` / `SUPABASE_S
   - 참조: PLAN.md §화면 2(a), §도메인 코어 계약, §성공 지표 / design 스킬
   - 테스트: T9, T13(버튼→action 경로)
 
-- [ ] 8. 카드 목록 + 원클릭 복사 (금고 메인 화면)
+- [x] 8. 카드 목록 + 원클릭 복사 (금고 메인 화면)
   - 경로: src/app/(product)/vault/page.tsx, src/features/vault/queries.ts, src/features/vault/ui/card-list.tsx
   - 완료 조건: 본인 카드가 카테고리별로 그룹핑되어 표시되고, 각 필드(기관/명칭/날짜) 옆 복사 버튼 클릭 시 클립보드에 복사되며 "복사됨" 피드백이 표시된다. 추출된 detail(자격증 번호 등 카테고리별 부가 필드)은 리뷰 폼에서 수정 가능하고 카드와 함께 저장되며, 카드 목록에서 detail의 각 필드도 동일하게 필드별 복사가 가능하다 — detail 유실은 명세 위반(§문제가 명시한 "자격증 번호"가 핵심 가치). 카드 0개일 때 업로드를 유도하는 빈 상태 화면이, 조회 중에는 로딩 상태가 표시된다.
   - 참조: PLAN.md §화면 2(b), §문제 / architecture 스킬 규칙 2 / design 스킬
   - 테스트: T12 (스모크 일부)
 
-- [ ] 9. 양식 매핑 (보조 기능)
+- [x] 9. 양식 매핑 (보조 기능)
   - 경로: src/features/form-mapping/ (map.ts, actions.ts, schema.ts, ui/form-mapper.tsx), src/app/(product)/vault/page.tsx (섹션 연결)
   - 완료 조건: 양식 텍스트를 붙여넣고 실행하면 `mapFormToAnswers`(서버 전용, Gemini structured output, 응답 zod 검증 — T11)가 항목별 [양식 항목 → 내 데이터 답안] 매칭을 반환해 표시되고, 각 답안에 복사 버튼이 있다. 매칭할 카드가 없는 항목은 "데이터 없음"으로 표시된다. AI 실패 시 에러 안내 + 재시도 버튼이 표시된다(화면이 죽지 않는다). vault 카드 데이터는 form-mapping이 직접 import하지 않고 page에서 조립해 전달한다.
   - 참조: PLAN.md §도메인 코어 계약 / architecture 스킬 규칙 1·2
@@ -147,7 +147,7 @@ env 키 이름 고정: `SUPABASE_URL` / `SUPABASE_PUBLISHABLE_KEY` / `SUPABASE_S
   - 참조: PLAN.md §화면 3, §데이터 모델 / architecture 스킬 규칙 3
   - 테스트: T10, T12 (스모크 일부)
 
-- [ ] 12. 배포 전 점검 + 스모크
+- [x] 12. 배포 전 점검 + 스모크
   - 경로: e2e/smoke.spec.ts, .env.example
   - 완료 조건: `pnpm check` 전체 통과. T12 스모크(랜딩 렌더 → CTA → 로그인 페이지 도달 + 대기명단 폼 표시)가 `pnpm e2e`로 통과한다 — 대기명단 제출 성공 메시지 검증은 실 Supabase 연결이 필요해 로컬 스모크에서 제외하고, 배포 후 수동 체크 항목으로 수행한다. .env.example에 5개 키 이름(§기술 스택 메모)이 정확히 기재되고, 클라이언트 번들에 SECRET_KEY/GEMINI_API_KEY가 노출되지 않음을 확인한다(빌드 산출물 grep).
   - 참조: shipping 스킬 / CLAUDE.md §명령어 / PLAN.md §기술 스택 메모
