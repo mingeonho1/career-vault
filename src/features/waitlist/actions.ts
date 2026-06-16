@@ -18,7 +18,7 @@ export async function joinWaitlist(
   const supabase = await createSupabaseServerClient();
   const { error } = await supabase
     .from("waitlist")
-    .insert({ email: parsed.data.email });
+    .insert({ email: parsed.data.email, source: "career-vault" });
 
   if (error) {
     if (error.code === "23505") {

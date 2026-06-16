@@ -11,7 +11,18 @@ const envSchema = z.object({
     .min(1, "SUPABASE_PUBLISHABLE_KEY is required"),
   SUPABASE_SECRET_KEY: z.string().min(1, "SUPABASE_SECRET_KEY is required"),
   GEMINI_API_KEY: z.string().min(1, "GEMINI_API_KEY is required"),
-  SITE_URL: z.string().url(),
+  SITE_URL: z.string().url().optional(),
 });
 
 export const env = envSchema.parse(process.env);
+
+/**
+ * 실행 환경에 맞는 베이스 URL을 반환한다.
+ * 우선순위: SITE_URL env → VERCEL_PROJECT_PRODUCTION_URL → localhost:3000
+ */
+export function siteUrl(): string {
+  if (env.SITE_URL) return env.SITE_URL;
+  const vercel = process.env.VERCEL_PROJECT_PRODUCTION_URL;
+  if (vercel) return `https://${vercel}`;
+  return "http://localhost:3000";
+}

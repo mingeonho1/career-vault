@@ -21,7 +21,7 @@ async function getUsageBytes(
   userId: string,
 ): Promise<number | null> {
   const { data, error } = await sb
-    .from("documents")
+    .from("career_vault_documents")
     .select("size_bytes")
     .eq("user_id", userId);
   if (error) return null;
@@ -61,7 +61,7 @@ async function insertDoc(
   p: { userId: string; path: string; name: string; mime: string; size: number },
 ) {
   const { data, error } = await sb
-    .from("documents")
+    .from("career_vault_documents")
     .insert({
       user_id: p.userId,
       storage_path: p.path,
@@ -145,7 +145,7 @@ async function fetchDocForExtract(
   userId: string,
 ) {
   const { data, error } = await sb
-    .from("documents")
+    .from("career_vault_documents")
     .select("storage_path, mime_type")
     .eq("id", documentId)
     .eq("user_id", userId)
@@ -155,7 +155,10 @@ async function fetchDocForExtract(
 }
 
 async function markFailed(sb: SupabaseClient, documentId: string) {
-  await sb.from("documents").update({ status: "failed" }).eq("id", documentId);
+  await sb
+    .from("career_vault_documents")
+    .update({ status: "failed" })
+    .eq("id", documentId);
 }
 
 type ExtractDocInput = { storage_path: string; mime_type: string };

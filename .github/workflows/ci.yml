@@ -36,7 +36,6 @@ jobs:
           SUPABASE_PUBLISHABLE_KEY: ci-placeholder
           SUPABASE_SECRET_KEY: ci-placeholder
           GEMINI_API_KEY: ci-placeholder
-          SITE_URL: https://placeholder.example.com
 
       - name: Dead code check (warning only)
         run: pnpm knip || echo "::warning::knip이 죽은 코드를 발견했습니다. reviewer 검수 시 확인하세요."

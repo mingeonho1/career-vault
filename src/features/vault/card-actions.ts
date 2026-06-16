@@ -15,7 +15,7 @@ async function insertCard(
   parsed: ReturnType<typeof saveCardSchema.parse>,
 ) {
   const { data, error } = await sb
-    .from("career_cards")
+    .from("career_vault_career_cards")
     .insert({ user_id: userId, ...parsed })
     .select("id")
     .single();
@@ -59,7 +59,7 @@ export async function saveCard(
 
   if (parsed.data.source_document_id) {
     await sb
-      .from("documents")
+      .from("career_vault_documents")
       .update({ status: "extracted" })
       .eq("id", parsed.data.source_document_id);
   }
@@ -79,7 +79,7 @@ export async function recordFeatureInterest(
   if (!user) return { ok: false, error: "로그인이 필요해요." };
 
   const { error } = await sb
-    .from("feature_interest")
+    .from("career_vault_feature_interest")
     .insert({ feature_key: parsed.data, user_id: user.id });
 
   // 23505 = unique_violation: 이미 관심 등록한 경우 — 성공으로 처리

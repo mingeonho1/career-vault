@@ -2,6 +2,13 @@
 
 ## Decisions
 
+### [2026-06-16] Supabase 단일 프로젝트 공유 — waitlist 공유(source 구분), 제품 고유 테이블 career*vault* prefix, SITE_URL 자동분기
+
+- 선택: waitlist 테이블을 여러 제품이 공유하되 `source` 컬럼으로 제품 구분, 제품 고유 테이블(`career_cards`, `documents`, `certificates`, `feature_interest`)에 `career_vault_` prefix 적용, `SITE_URL`을 optional로 바꾸고 `siteUrl()` 헬퍼로 Vercel 자동분기
+- 대안: 제품별 Supabase 프로젝트 분리
+- 이유: 단일 프로젝트 공유로 Supabase 무료 플랜(2프로젝트 한도) 절약. waitlist는 source 필터로 분리하고 prefix로 고유 테이블 충돌 방지
+- 트레이드오프: 테이블 이름이 길어지나 명확성은 오름
+
 ### [2026-06-13] 기본 추출 모델을 gemini-3.1-flash-lite로 변경
 
 - 선택: `extractCardsFromDocument` 기본 model 인자를 `"gemini-3.1-flash-lite"`로 설정

@@ -1,4 +1,4 @@
-create table if not exists feature_interest (
+create table if not exists public.career_vault_feature_interest (
   id uuid primary key default gen_random_uuid(),
   feature_key text not null,
   user_id uuid not null references auth.users(id) on delete cascade,
@@ -6,10 +6,10 @@ create table if not exists feature_interest (
   unique(feature_key, user_id)
 );
 
-alter table feature_interest enable row level security;
+alter table public.career_vault_feature_interest enable row level security;
 
 create policy "authenticated users can insert own rows"
-  on feature_interest
+  on public.career_vault_feature_interest
   for insert
   to authenticated
   with check (user_id = auth.uid());

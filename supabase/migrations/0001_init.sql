@@ -3,9 +3,9 @@
 -- ============================================================
 
 -- ----------------------------------------
--- 1. documents 테이블
+-- 1. career_vault_documents 테이블
 -- ----------------------------------------
-create table if not exists public.documents (
+create table if not exists public.career_vault_documents (
   id              uuid primary key default gen_random_uuid(),
   user_id         uuid not null references auth.users(id) on delete cascade,
   storage_path    text not null,
@@ -17,30 +17,30 @@ create table if not exists public.documents (
   created_at      timestamptz not null default now()
 );
 
-alter table public.documents enable row level security;
+alter table public.career_vault_documents enable row level security;
 
 -- 본인 행만 select/insert/update/delete
-create policy "documents: owner select"
-  on public.documents for select
+create policy "career_vault_documents: owner select"
+  on public.career_vault_documents for select
   using (user_id = auth.uid());
 
-create policy "documents: owner insert"
-  on public.documents for insert
+create policy "career_vault_documents: owner insert"
+  on public.career_vault_documents for insert
   with check (user_id = auth.uid());
 
-create policy "documents: owner update"
-  on public.documents for update
+create policy "career_vault_documents: owner update"
+  on public.career_vault_documents for update
   using (user_id = auth.uid());
 
-create policy "documents: owner delete"
-  on public.documents for delete
+create policy "career_vault_documents: owner delete"
+  on public.career_vault_documents for delete
   using (user_id = auth.uid());
 
 -- ----------------------------------------
--- 2. career_cards 테이블
+-- 2. career_vault_career_cards 테이블
 -- 주의: 주민등록번호 저장용 컬럼 없음
 -- ----------------------------------------
-create table if not exists public.career_cards (
+create table if not exists public.career_vault_career_cards (
   id                  uuid primary key default gen_random_uuid(),
   user_id             uuid not null references auth.users(id) on delete cascade,
   category            text not null
@@ -53,38 +53,41 @@ create table if not exists public.career_cards (
   start_date          date,
   end_date            date,
   detail              jsonb,
-  source_document_id  uuid references public.documents(id) on delete set null,
+  source_document_id  uuid references public.career_vault_documents(id) on delete set null,
   created_at          timestamptz not null default now()
 );
 
-alter table public.career_cards enable row level security;
+alter table public.career_vault_career_cards enable row level security;
 
 -- 본인 행만 select/insert/update/delete
-create policy "career_cards: owner select"
-  on public.career_cards for select
+create policy "career_vault_career_cards: owner select"
+  on public.career_vault_career_cards for select
   using (user_id = auth.uid());
 
-create policy "career_cards: owner insert"
-  on public.career_cards for insert
+create policy "career_vault_career_cards: owner insert"
+  on public.career_vault_career_cards for insert
   with check (user_id = auth.uid());
 
-create policy "career_cards: owner update"
-  on public.career_cards for update
+create policy "career_vault_career_cards: owner update"
+  on public.career_vault_career_cards for update
   using (user_id = auth.uid());
 
-create policy "career_cards: owner delete"
-  on public.career_cards for delete
+create policy "career_vault_career_cards: owner delete"
+  on public.career_vault_career_cards for delete
   using (user_id = auth.uid());
 
 -- ----------------------------------------
--- 3. waitlist 테이블
+-- 3. waitlist 테이블 (공유, source 구분)
 -- ----------------------------------------
 create table if not exists public.waitlist (
-  id          uuid primary key default gen_random_uuid(),
-  email       text not null unique,
-  user_id     uuid references auth.users(id) on delete set null,
-  created_at  timestamptz not null default now()
+  id         bigint generated always as identity primary key,
+  email      text not null,
+  source     text not null,
+  created_at timestamptz not null default now(),
+  unique (email, source)
 );
+
+create index if not exists waitlist_source_idx on public.waitlist (source);
 
 alter table public.waitlist enable row level security;
 
@@ -93,10 +96,10 @@ create policy "waitlist: anon insert"
   on public.waitlist for insert
   with check (true);
 
--- select/update/delete는 본인(user_id 연결된 경우)만
+-- select는 service role에서만 (관리 목적)
 create policy "waitlist: owner select"
   on public.waitlist for select
-  using (user_id = auth.uid());
+  using (false);
 
 -- ----------------------------------------
 -- 4. Storage — private 버킷 certificates
