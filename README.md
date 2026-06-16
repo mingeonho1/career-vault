@@ -1,53 +1,23 @@
-# MVP Factory
+# 이력 금고 (career-vault)
 
-매주말 MVP 하나를 기획 → 구현 → 검수 → 배포하는 에이전트 하네스 템플릿.
-새 빌드는 이 리포를 **Use this template**으로 복제해서 시작한다.
+> 자소서 쓸 때마다 찾는 그 정보(학교·자격증·경력 날짜), 증명서 한 번 올려두고 3초 안에 복사하세요.
 
-## 철학
+## 무엇 / 왜
 
-- **에이전트 분리**: 기획(lead) / 구현(builder) / 검수(reviewer)를 별도 서브에이전트로 분리. 기획한 에이전트가 자기 결과물을 검수하면 같은 맹점을 두 번 통과하므로, 검수는 깨끗한 컨텍스트가 맡는다.
-- **규칙은 훅으로 강제**: 프롬프트는 해석에 의존하지만 훅은 결정론적이다. 포맷팅, 위험 명령 차단, 품질 게이트는 전부 훅이 처리한다.
-- **컨텍스트 경제**: CLAUDE.md는 철칙과 포인터만. 상세 규칙은 스킬로 분리해 관련 작업 때만 조건부 로딩. 무거운 구현 로그는 서브에이전트의 격리 컨텍스트에서 소각.
+- **무엇**: 증명서 파일(PDF/이미지)을 올리면 AI(Gemini)가 기관·명칭·날짜를 구조화 추출해 "이력 카드"로 저장하고, 항목별 원클릭 복사로 꺼내 쓴다. 보조: 지원서 양식 텍스트를 붙여넣으면 내 카드로 답안 매칭 생성.
+- **왜**: 지원서를 10개 이상 쓰는 취준생·이직 준비자가 지원서 1건당 수십 분씩 증명서를 뒤지는 낭비를 없앤다.
 
-## 5분 시작
+## 로컬 실행
 
 ```bash
 pnpm install
-claude   # Claude Code 실행
+pnpm dev          # http://localhost:3000
 ```
 
-첫 프롬프트: `lead로 이번 주 빌드 PLAN.md 만들어줘. 아이디어: <한 줄>`
+## 데이터 / 배포
 
-## 구조
+- 공유 Supabase 사용(Auth=매직링크). 제품 고유 테이블: `career_vault_documents`, `career_vault_career_cards`, `career_vault_feature_interest` + 공유 `waitlist`(`source='career-vault'`) + storage 버킷 `career-vault-certificates`. 모든 테이블 RLS(본인 행만).
+- env: `SUPABASE_URL` / `SUPABASE_PUBLISHABLE_KEY` / `SUPABASE_SECRET_KEY` / `GEMINI_API_KEY`. 매직링크 redirect는 `siteUrl()` 자동 분기(커스텀 도메인이면 `SITE_URL`).
+- 배포: `bash scripts/bootstrap.sh` 후 Supabase Auth → URL Configuration에 프로덕션 도메인 등록(매직링크). 이후 push마다 자동 배포.
 
-| 경로 | 역할 |
-|---|---|
-| `CLAUDE.md` | 철칙 5개 + 포인터 (항상 로딩) |
-| `PLAN.md` | 이번 빌드의 범위 정의 (lead가 생성) |
-| `BUILD_LOG.md` | 의사결정/삽질 로그 — 블로그 글의 원재료 |
-| `.claude/agents/` | lead(기획) · builder(구현) · reviewer(검수) |
-| `.claude/skills/` | architecture · conventions · shipping · log-decision · write-post · blog-style |
-| `.claude/hooks/` | guard(위험 명령 차단) · format(자동 포맷) · verify(종료 전 품질 게이트) |
-
-## 주말 운영 타임라인
-
-| 시간 | 작업 |
-|---|---|
-| 금 저녁 | 아이디어 확정 → lead가 PLAN.md 생성 → Non-goals 승인 |
-| 토 | builder 구현 (태스크당 `pnpm check` 통과 필수) → reviewer 1차 검수 |
-| 일 오전 | reviewer `SHIP IT` → shipping 스킬 절차로 Vercel 배포 + 계측 |
-| 일 오후 | write-post 스킬로 블로그 글 → 발행 → 아래 표 갱신 |
-
-**킬 규칙**: 배포 2주 내 결제/사용 신호 0이면 유지보수 중단 (리포는 공개 유지).
-
-## 품질 게이트 (3중)
-
-1. 스킬 — 에이전트가 컨벤션/아키텍처 규칙 참조
-2. 훅 — Stop 시 `pnpm check` 실패하면 세션 종료 자체가 차단됨
-3. CI — push마다 lint + typecheck + test + build + knip
-
-## 빌드 결과
-
-| 주차 | 제품 | 링크 | 검증 지표 | 결과 |
-|---|---|---|---|---|
-| — | — | — | — | — |
+> 주민등록번호는 어떤 테이블에도 저장하지 않는다. 범위 밖: 결제(대기명단으로 검증). (상세 PLAN.md)
