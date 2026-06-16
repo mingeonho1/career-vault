@@ -34,7 +34,7 @@ async function getUsageBytes(
 async function storeFile(sb: SupabaseClient, file: File, path: string) {
   const buf = await file.arrayBuffer();
   const { error } = await sb.storage
-    .from("certificates")
+    .from("career-vault-certificates")
     .upload(path, buf, { contentType: file.type });
   if (error) {
     console.error("[uploadFile] storage upload error", {
@@ -44,7 +44,7 @@ async function storeFile(sb: SupabaseClient, file: File, path: string) {
     return null;
   }
   const { data, error: urlError } = await sb.storage
-    .from("certificates")
+    .from("career-vault-certificates")
     .createSignedUrl(path, 3600);
   if (urlError) {
     console.error("[uploadFile] createSignedUrl error", {
@@ -171,7 +171,7 @@ async function downloadAndExtract(
   { ok: true; cards: ExtractedCard[] } | { ok: false; error: string }
 > {
   const { data: blob, error: dlErr } = await sb.storage
-    .from("certificates")
+    .from("career-vault-certificates")
     .download(doc.storage_path);
   if (dlErr || !blob) {
     await markFailed(sb, documentId);

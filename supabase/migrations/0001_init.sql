@@ -102,39 +102,39 @@ create policy "waitlist: owner select"
   using (false);
 
 -- ----------------------------------------
--- 4. Storage — private 버킷 certificates
+-- 4. Storage — private 버킷 career-vault-certificates (공유 프로젝트: 버킷명 네임스페이싱)
 -- ----------------------------------------
 
 -- 버킷 생성 (private, 파일당 10MB)
 insert into storage.buckets (id, name, public, file_size_limit)
-values ('certificates', 'certificates', false, 10485760)
+values ('career-vault-certificates', 'career-vault-certificates', false, 10485760)
 on conflict (id) do nothing;
 
 -- 본인 경로({user_id}/)만 read/write
-create policy "storage certificates: owner select"
+create policy "career_vault certificates: owner select"
   on storage.objects for select
   using (
-    bucket_id = 'certificates'
+    bucket_id = 'career-vault-certificates'
     and auth.uid()::text = (string_to_array(name, '/'))[1]
   );
 
-create policy "storage certificates: owner insert"
+create policy "career_vault certificates: owner insert"
   on storage.objects for insert
   with check (
-    bucket_id = 'certificates'
+    bucket_id = 'career-vault-certificates'
     and auth.uid()::text = (string_to_array(name, '/'))[1]
   );
 
-create policy "storage certificates: owner update"
+create policy "career_vault certificates: owner update"
   on storage.objects for update
   using (
-    bucket_id = 'certificates'
+    bucket_id = 'career-vault-certificates'
     and auth.uid()::text = (string_to_array(name, '/'))[1]
   );
 
-create policy "storage certificates: owner delete"
+create policy "career_vault certificates: owner delete"
   on storage.objects for delete
   using (
-    bucket_id = 'certificates'
+    bucket_id = 'career-vault-certificates'
     and auth.uid()::text = (string_to_array(name, '/'))[1]
   );
